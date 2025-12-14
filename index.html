@@ -1,158 +1,504 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>memeso — мемная стена</title>
+  <meta charset="UTF-8" />
+  <title>memeso feed</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <style>
+    :root {
+      --accent-yellow: #f6c90e;
+      --accent-yellow-soft: rgba(246, 201, 14, 0.12);
+      --bg-main: #05050a;
+      --bg-card: #12121c;
+      --bg-card-alt: #181824;
+      --text-main: #f5f5ff;
+      --text-muted: #a3a3c0;
+      --radius-card: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: system-ui, sans-serif;
-      background: #0a0a12;
-      color: #f5f5f5;
       margin: 0;
-      padding: 24px;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #181828 0, transparent 55%),
+        var(--bg-main);
+      color: var(--text-main);
+      padding: 24px 10px 40px;
+      display: flex;
+      justify-content: center;
     }
 
-    .memo {
-      background: #14141f;
-      border: 1px solid #2b2b3a;
-      border-top: 3px solid #f6c90e;
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 20px;
-      box-shadow: 0 0 16px rgba(0,0,0,0.2);
+    .page {
+      width: 100%;
+      max-width: 860px;
     }
 
-    .memo img {
+    .header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .logo {
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: 0.06em;
+      text-transform: lowercase;
+    }
+
+    .logo span {
+      color: var(--accent-yellow);
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .feed {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .memo-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-card);
+      border-top: 3px solid var(--accent-yellow);
+      border: 1px solid #27273a;
+      padding: 14px 16px 12px;
+      box-shadow: 0 0 14px rgba(0, 0, 0, 0.32);
+      animation: fadeInUp 0.25s ease forwards;
+      opacity: 0;
+      transform: translateY(4px);
+    }
+
+    .memo-text {
+      font-size: 14px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .memo-meta {
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .memo-images {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .memo-images img {
       max-width: 100%;
       border-radius: 10px;
-      margin-top: 8px;
+      display: block;
     }
 
+    /* ПРОФИЛЬ */
+
     .profile-card {
-      border: 1px solid rgba(246, 201, 14, 0.6);
-      border-radius: 14px;
+      border-radius: var(--radius-card);
       overflow: hidden;
-      margin-bottom: 20px;
-      background: #1a1a27;
+      border: 1px solid rgba(246, 201, 14, 0.6);
+      box-shadow: 0 0 18px rgba(0, 0, 0, 0.25);
+      background: #181824;
+      animation: fadeInUp 0.25s ease forwards;
+      opacity: 0;
+      transform: translateY(4px);
     }
 
     .profile-banner {
-      height: 140px;
+      position: relative;
+      width: 100%;
+      height: 150px;
       background-size: cover;
       background-position: center;
+      background-repeat: no-repeat;
+      background-color: #14141f;
+    }
+
+    .profile-banner::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.05),
+        rgba(0, 0, 0, 0.7)
+      );
     }
 
     .profile-avatar {
-      width: 72px;
-      height: 72px;
+      width: 78px;
+      height: 78px;
       border-radius: 999px;
-      border: 3px solid #0b0b14;
-      margin: -36px auto 8px;
-      display: block;
+      border: 3px solid #05050a;
       background-size: cover;
       background-position: center;
+      background-color: #222;
+      box-shadow: 0 0 14px rgba(0, 0, 0, 0.6);
+      margin: -40px auto 8px;
+      position: relative;
+      z-index: 2;
     }
 
     .profile-body {
+      padding: 4px 14px 14px;
       text-align: center;
-      padding: 8px 12px 14px;
+    }
+
+    .profile-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .profile-title-emoji {
+      font-size: 20px;
+    }
+
+    .profile-title-text {
+      font-weight: 600;
+      font-size: 15px;
     }
 
     .profile-bio {
-      opacity: 0.9;
       font-size: 13px;
-      margin: 8px 0;
+      color: var(--text-main);
+      opacity: 0.95;
+      margin-bottom: 10px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
     }
 
-    .profile-links a {
-      display: inline-block;
-      margin: 2px 6px;
+    .profile-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .profile-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
       padding: 4px 10px;
-      border: 1px solid #f6c90e;
       border-radius: 999px;
+      border: 1px solid var(--accent-yellow);
       font-size: 12px;
       text-decoration: none;
-      color: #f6c90e;
+      color: var(--accent-yellow);
+      background: rgba(5, 5, 10, 0.85);
+      box-shadow: 0 0 10px var(--accent-yellow-soft);
+      transition: transform 0.15s ease, box-shadow 0.15s ease,
+        background-color 0.15s ease;
     }
 
+    .profile-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 14px var(--accent-yellow-soft);
+      background: rgba(5, 5, 10, 1);
+    }
+
+    .profile-link-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    /* СОСТОЯНИЯ */
+
+    .status {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    .status.error {
+      color: #ff6b81;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 18px 8px 32px;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>memeso feed</h1>
-  <div id="feed"></div>
+  <div class="page">
+    <div class="header">
+      <div>
+        <div class="logo"><span>memeso</span> feed</div>
+        <div class="subtitle">мемы с memosshitpost.duckdns.org через API</div>
+      </div>
+    </div>
+
+    <div id="status" class="status">Загружаем мемы…</div>
+    <div id="feed" class="feed"></div>
+  </div>
 
   <script>
-    const FEED = document.getElementById("feed");
-    const API = "https://memosshitpost.duckdns.org/api/memo/all"; // ← сюда вставь ссылку на свой Memos API
+    // === НАСТРОЙКИ ДЛЯ ТВОЕГО MEMOS ===
+    const API = "https://memosshitpost.duckdns.org/api/memo/all";
+    const TOKEN =
+      "eyJhbGciOiJIUzI1NiIsImtpZCI6InYxIiwidHlwIjoiSldUIn0.eyJuYW1lIjoiZGl4aTMyIiwiaXNzIjoibWVtb3MiLCJzdWIiOiIxIiwiYXVkIjpbInVzZXIuYWNjZXNzLXRva2VuIl0sImlhdCI6MTc2NTc1MTQxMX0.kksT1zSOzNmEzIYGSJGM-SSaPR6CWCF_Q1a_zG2WvJs";
+
+    const feedEl = document.getElementById("feed");
+    const statusEl = document.getElementById("status");
 
     async function loadMemos() {
-      const res = await fetch(API);
-      const data = await res.json();
+      try {
+        statusEl.textContent = "Загружаем мемы из Memos…";
 
-      data.forEach(memo => {
-        const text = memo.content.trim();
-
-        if (text.toLowerCase().includes("#profile")) {
-          const profile = parseProfile(text);
-          if (profile) FEED.appendChild(renderProfile(profile));
-        } else {
-          FEED.appendChild(renderMemo(text, memo.resourceList));
-        }
-      });
-    }
-
-    function renderMemo(text, resources) {
-      const el = document.createElement("div");
-      el.className = "memo";
-      el.textContent = text;
-
-      if (resources && resources.length) {
-        resources.forEach(r => {
-          if (r.type === "image") {
-            const img = document.createElement("img");
-            img.src = r.externalLink;
-            el.appendChild(img);
-          }
+        const res = await fetch(API, {
+          headers: {
+            Authorization: `Bearer ${TOKEN}`,
+          },
         });
+
+        if (!res.ok) {
+          throw new Error("HTTP " + res.status);
+        }
+
+        const json = await res.json();
+        const memos = Array.isArray(json) ? json : json.data || [];
+
+        if (!memos.length) {
+          statusEl.textContent = "Пока что здесь пусто. Запости что-нибудь в Memos.";
+          return;
+        }
+
+        statusEl.textContent = "";
+        memos.forEach((memo) => renderMemo(memo));
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent =
+          "Не удалось загрузить данные из Memos. Открой консоль (F12) и глянь ошибку.";
+        statusEl.classList.add("error");
       }
-      return el;
     }
+
+    function renderMemo(memo) {
+      const text = (memo.content || "").trim();
+
+      // Профильная заметка
+      if (text.toLowerCase().includes("#profile")) {
+        const profile = parseProfile(text);
+        const card = createProfileCard(profile);
+        feedEl.appendChild(card);
+        return;
+      }
+
+      // Обычный мем
+      const card = document.createElement("div");
+      card.className = "memo-card";
+
+      const textEl = document.createElement("div");
+      textEl.className = "memo-text";
+      textEl.textContent = text;
+      card.appendChild(textEl);
+
+      // Картинки
+      const resources = memo.resourceList || memo.resources || [];
+      if (resources.length) {
+        const imgsWrap = document.createElement("div");
+        imgsWrap.className = "memo-images";
+
+        resources.forEach((r) => {
+          // у Memos может быть externalLink или link
+          const src = r.externalLink || r.publicLink || r.link;
+          if (!src) return;
+          if (r.type !== "image" && !/\.(png|jpe?g|gif|webp)$/i.test(src)) return;
+
+          const img = document.createElement("img");
+          img.src = src;
+          imgsWrap.appendChild(img);
+        });
+
+        if (imgsWrap.children.length) {
+          card.appendChild(imgsWrap);
+        }
+      }
+
+      // Метаданные (дата, теги и т.п. по желанию)
+      const meta = document.createElement("div");
+      meta.className = "memo-meta";
+      const createdAt = memo.createdTs
+        ? new Date(memo.createdTs * 1000)
+        : null;
+      meta.innerHTML = `
+        <span>${
+          createdAt ? createdAt.toLocaleString("ru-RU") : "без даты"
+        }</span>
+        <span>ID: ${memo.id ?? "?"}</span>
+      `;
+      card.appendChild(meta);
+
+      feedEl.appendChild(card);
+    }
+
+    // === ПАРСИНГ ПРОФИЛЯ (#profile) ===
+    // формат:
+    // #profile
+    // banner: https://...
+    // avatar: https://...
+    // emoji: 🧠
+    // title: Мемный маг
+    // bio: текст био...
+    //
+    // links:
+    // - Telegram | https://t.me/...
+    // - Discord  | https://discord.com/...
 
     function parseProfile(raw) {
-      const lines = raw.split("\n").map(l => l.trim());
-      const profile = {banner:"",avatar:"",title:"",bio:"",links:[]};
+      const profile = {
+        banner: "",
+        avatar: "",
+        emoji: "",
+        title: "",
+        bio: "",
+        links: [],
+      };
+
+      const lines = raw
+        .split("\n")
+        .map((l) => l.trim())
+        .filter((l) => l && !l.toLowerCase().startsWith("#profile"));
+
+      let inLinks = false;
 
       for (const line of lines) {
-        if (line.startsWith("banner:")) profile.banner = line.replace("banner:","").trim();
-        else if (line.startsWith("avatar:")) profile.avatar = line.replace("avatar:","").trim();
-        else if (line.startsWith("title:")) profile.title = line.replace("title:","").trim();
-        else if (line.startsWith("bio:")) profile.bio = line.replace("bio:","").trim();
-        else if (line.startsWith("-")) {
-          const [name,url] = line.replace("-","").split("|").map(x=>x.trim());
-          if(name&&url) profile.links.push({name,url});
+        if (/^links?:/i.test(line)) {
+          inLinks = true;
+          continue;
+        }
+
+        if (inLinks && /^[-*]\s+/.test(line)) {
+          const body = line.replace(/^[-*]\s+/, "");
+          const [label, url] = body.split("|").map((x) => x.trim());
+          if (label && url) profile.links.push({ label, url });
+          continue;
+        }
+
+        const idx = line.indexOf(":");
+        if (idx === -1) {
+          profile.bio = (profile.bio + "\n" + line).trim();
+          continue;
+        }
+
+        const key = line.slice(0, idx).trim().toLowerCase();
+        const value = line.slice(idx + 1).trim();
+
+        switch (key) {
+          case "banner":
+            profile.banner = value;
+            break;
+          case "avatar":
+            profile.avatar = value;
+            break;
+          case "emoji":
+          case "icon":
+            profile.emoji = value;
+            break;
+          case "title":
+          case "titul":
+            profile.title = value;
+            break;
+          case "bio":
+            profile.bio = value;
+            break;
+          default:
+            profile.bio = (profile.bio + "\n" + line).trim();
+            break;
         }
       }
+
       return profile;
     }
 
-    function renderProfile(p) {
+    function createProfileCard(p) {
       const wrap = document.createElement("div");
       wrap.className = "profile-card";
+
       wrap.innerHTML = `
-        <div class="profile-banner" style="background-image:url('${p.banner}')"></div>
-        <div class="profile-avatar" style="background-image:url('${p.avatar}')"></div>
+        <div class="profile-banner" style="${
+          p.banner ? `background-image:url('${p.banner}')` : ""
+        }"></div>
+        <div class="profile-avatar" style="${
+          p.avatar ? `background-image:url('${p.avatar}')` : ""
+        }"></div>
         <div class="profile-body">
-          <strong>${p.title}</strong>
-          <div class="profile-bio">${p.bio}</div>
+          <div class="profile-title-row">
+            ${
+              p.emoji
+                ? `<span class="profile-title-emoji">${p.emoji}</span>`
+                : ""
+            }
+            ${
+              p.title
+                ? `<span class="profile-title-text">${p.title}</span>`
+                : ""
+            }
+          </div>
+          ${
+            p.bio
+              ? `<div class="profile-bio">${escapeHtml(p.bio)}</div>`
+              : ""
+          }
           <div class="profile-links">
-            ${p.links.map(l=>`<a href="${l.url}" target="_blank">${l.name}</a>`).join("")}
+            ${p.links
+              .map(
+                (l) => `
+              <a class="profile-link" href="${l.url}" target="_blank" rel="noopener">
+                <span class="profile-link-dot"></span>
+                <span>${l.label}</span>
+              </a>
+            `
+              )
+              .join("")}
           </div>
         </div>
       `;
+
       return wrap;
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
     }
 
     loadMemos();
   </script>
 </body>
 </html>
+
